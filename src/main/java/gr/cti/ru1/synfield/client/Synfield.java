@@ -60,7 +60,7 @@ public final class Synfield {
     }
 
     public SynfieldMeasurementsPage getMeasurements(final String mac, final String startDate, final String endDate) throws IOException {
-        final String responseString = getPage("/v1/gateway/" + mac + "/measurements/" + startDate + "/" + endDate + "/?limit=200");
+        final String responseString = getPage("/v1/gateway/" + mac + "/measurements/" + startDate + "/" + endDate + "/?limit=2000");
         return new ObjectMapper().readValue(responseString, SynfieldMeasurementsPage.class);
     }
 
