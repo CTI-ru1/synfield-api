@@ -1,11 +1,21 @@
-package gr.cti.ru1.synfield.client.model.measurements;
+package gr.cti.ru1.synfield.client.model.v1.measurements;
 
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * Models a Synfield API Measurement.
  */
+@Getter
+@Setter
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SynfieldMeasurement {
 
@@ -14,42 +24,6 @@ public class SynfieldMeasurement {
     private String timestamp;
     private String unit;
     private String value;
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public String getService() {
-        return service;
-    }
-
-    public void setService(String service) {
-        this.service = service;
-    }
-
-    public String getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(String timestamp) {
-        this.timestamp = timestamp;
-    }
-
-    public String getUnit() {
-        return unit;
-    }
-
-    public void setUnit(String unit) {
-        this.unit = unit;
-    }
-
-    public String getValue() {
-        return value;
-    }
 
     public double getDoubleValue() {
         if (unit.equals("Beaufort")) {
@@ -106,19 +80,4 @@ public class SynfieldMeasurement {
         return Double.parseDouble(value);
     }
 
-    public void setValue(String value) {
-        this.value = value;
-    }
-
-    @Override
-    public String toString() {
-        return "Measurement{" +
-                "id=" + id +
-                ", service='" + service + '\'' +
-                ", timestamp='" + timestamp + '\'' +
-                ", unit='" + unit + '\'' +
-                ", value='" + value + '\'' +
-                ", doubleValue=" + getDoubleValue() +
-                '}';
-    }
 }
