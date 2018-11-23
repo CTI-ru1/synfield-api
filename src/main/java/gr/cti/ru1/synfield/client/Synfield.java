@@ -12,6 +12,7 @@ import org.apache.commons.codec.binary.Base64;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -22,10 +23,6 @@ import java.nio.charset.Charset;
  * @author Dimitrios Amaxilatis
  */
 public final class Synfield {
-    /**
-     * LOGGER.
-     */
-    private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(Synfield.class);
     
     /**
      * The basic authentication token form Synfield app.
@@ -91,8 +88,13 @@ public final class Synfield {
     }
     
     public Measurements getNodeMeasurements(Node node, String from, String to) throws IOException {
-        final String responseString = getPagev2("/nodes/" + node.getSerialNumber() + "/measurements/" + from + "/" + to);
+        final String responseString = getPagev2("/nodes/" + node.getSerialNumber() + "/measurements/" + from + "/" + to, 1000);
         return mapper.readValue(responseString, Measurements.class);
+    }
+    
+    public SynfieldMeasurementsPage getMeasurements(final Node node, final SensingServices sensingService, final String startDate, final String endDate) throws IOException {
+        final String responseString = getPagev2("/v2/nodes/" + node.getSerialNumber() + "/sensing_services/" + sensingService.getId() + "/measurements/" + startDate + "/" + endDate);
+        return new ObjectMapper().readValue(responseString, SynfieldMeasurementsPage.class);
     }
     
     /**
@@ -119,13 +121,24 @@ public final class Synfield {
     }
     
     private String getPagev2(final String path) throws IOException {
-        return getPage(baseUrlv2, path);
+        return getPagev2(path, null);
+    }
+    
+    private String getPagev2(final String path, Integer pageSize) throws IOException {
+        return getPage(baseUrlv2, path, pageSize);
     }
     
     private String getPage(final String baseUrl, final String path) throws IOException {
+        return getPage(baseUrl, path, null);
+    }
+    
+    private String getPage(final String baseUrl, final String path, final Integer pageSize) throws IOException {
         final Client client = ClientBuilder.newClient();
-        final javax.ws.rs.core.Response response = client.target(baseUrl).path(path).request(MediaType.APPLICATION_JSON_TYPE).header("Authorization", "Basic " + basiscAuthenticationToken).header("Accept", "application/json").get();
-        LOGGER.debug("status: " + response.getStatus());
+        WebTarget reqPath = client.target(baseUrl).path(path);
+        if (pageSize != null) {
+            reqPath = reqPath.queryParam("page_size", pageSize);
+        }
+        final javax.ws.rs.core.Response response = reqPath.request(MediaType.APPLICATION_JSON_TYPE).header("Authorization", "Basic " + basiscAuthenticationToken).header("Accept", "application/json").get();
         return response.readEntity(String.class);
     }
 }
